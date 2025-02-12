@@ -2,7 +2,7 @@
 
 ![Demo](sample.png)
 
-An interactive implementation of Conway's Game of Life with a modern, responsive interface. Built with Flask and vanilla JavaScript. 
+Enjoy [cellular automata](https://en.wikipedia.org/wiki/Cellular_automaton) with an interactive implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) with built with Flask and vanilla JavaScript. 
 
 ## Live Version
 Click [here](https://flask-game-of-life.onrender.com/) for a live implementation.
