@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conway's Game of Life</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --cell-alive: #22c55e;
+      --cell-dead: #f1f5f9;
+      --bg-color: #f8fafc;
+      --text-color: #1e293b;
+      --border-radius: 12px;
+      --control-bg: white;
+      --shadow-color: rgba(0, 0, 0, 0.08);
+      --button-shadow: rgba(99, 102, 241, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-color), #eef2ff);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 2.5rem;
+      text-shadow: 0 2px 4px var(--shadow-color);
+    }
+
+    #controls {
+      background: var(--control-bg);
+      padding: 1.75rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px var(--shadow-color);
+      backdrop-filter: blur(8px);
+    }
+
+    .control-group {
+      margin: 1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    button {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: var(--border-radius);
+      background-color: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px var(--button-shadow);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--button-shadow);
+      filter: brightness(1.1);
+    }
+
+    button:active {
+      transform: translateY(0);
+      filter: brightness(0.95);
+    }
+
+    #stopButton {
+      background-color: #ef4444;
+    }
+
+    #randomButton {
+      background-color: #8b5cf6;
+    }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+    }
+
+    .speed-control label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    input[type="number"] {
+      padding: 0.75rem;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--border-radius);
+      width: 120px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--button-shadow);
+    }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(30, 20px);
+      grid-gap: 2px;
+      background: var(--control-bg);
+      padding: 1.75rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px var(--shadow-color);
+      margin: 0 auto;
+      width: fit-content;
+      backdrop-filter: blur(8px);
+    }
+
+    .cell {
+      width: 20px;
+      height: 20px;
+      background-color: var(--cell-dead);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .cell:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .alive {
+      background-color: var(--cell-alive);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      #grid {
+        grid-template-columns: repeat(30, 15px);
+        padding: 1.25rem;
+      }
+
+      .cell {
+        width: 15px;
+        height: 15px;
+      }
+
+      button {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+      }
+
+      .speed-control {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Conway's Game of Life</h1>
+
+    <div id="grid"></div>
+    
+    <div id="controls">
+      <div class="control-group">
+        <button id="startButton">start</button>
+        <button id="stopButton">stop</button>
+        <button id="stepBackButton">back</button>
+        <button id="stepForwardButton">forward</button>
+        <button id="randomButton">🎲</button>
+      </div>
+      <div class="control-group speed-control">
+        <label for="speedInput">speed</label>
+        <input type="number" id="speedInput" min="0.1" max="100" value="2" step="0.1">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GRID_WIDTH = 30;
+    const GRID_HEIGHT = 30;
+    let intervalId = null; // Will store our simulation interval if started
+    let stepDelay = 500; // Default step delay in milliseconds (2 steps per second)
+
+    const gridContainer = document.getElementById("grid");
+    const speedInput = document.getElementById("speedInput");
+
+    // Create the cell elements in the DOM
+    for (let r = 0; r < GRID_HEIGHT; r++) {
+      for (let c = 0; c < GRID_WIDTH; c++) {
+        const cellDiv = document.createElement("div");
+        cellDiv.className = "cell";
+        cellDiv.id = `cell-${r}-${c}`;
+        
+        // On click, toggle that cell's state
+        cellDiv.addEventListener('click', () => toggleCell(r, c));
+        
+        gridContainer.appendChild(cellDiv);
+      }
+    }
+
+    // Function to re-render the grid based on new state
+    function renderGrid(newGrid) {
+      for (let r = 0; r < GRID_HEIGHT; r++) {
+        for (let c = 0; c < GRID_WIDTH; c++) {
+          const cellDiv = document.getElementById(`cell-${r}-${c}`);
+          if (newGrid[r][c] === 1) {
+            cellDiv.classList.add("alive");
+          } else {
+            cellDiv.classList.remove("alive");
+          }
+        }
+      }
+    }
+
+    // Fetch and display the initial state from the server
+    function loadInitialState() {
+      fetch("/state")
+        .then(response => response.json())
+        .then(data => {
+          renderGrid(data);
+        });
+    }
+
+    // Toggle a cell by sending a request to /toggle_cell
+    function toggleCell(row, col) {
+      fetch('/toggle_cell', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ row: row, col: col })
+      })
+      .then(response => response.json())
+      .then(data => {
+        renderGrid(data);
+      });
+    }
+
+    // Request the server to step one generation and update the UI
+    function stepForward() {
+      fetch("/step", { method: "POST" })
+        .then((response) => response.json())
+        .then((data) => {
+          renderGrid(data);
+        });
+    }
+
+    // Request the server to step back one generation
+    function stepBack() {
+      stopSimulation(); // Pause simulation when stepping
+      fetch("/step_back", { method: "POST" })
+        .then((response) => response.json())
+        .then((data) => {
+          renderGrid(data);
+        });
+    }
+
+    // Generate a new random board
+    function randomBoard() {
+      stopSimulation(); // Pause simulation when generating random board
+      fetch("/random", { method: "POST" })
+        .then(response => response.json())
+        .then(data => {
+          renderGrid(data);
+        });
+    }
+
+    // Start the simulation
+    function startSimulation() {
+      if (!intervalId) {
+        intervalId = setInterval(stepForward, stepDelay);
+      }
+    }
+
+    // Stop the simulation
+    function stopSimulation() {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    }
+
+    // Update simulation speed
+    function updateSpeed(stepsPerSecond) {
+      stepDelay = Math.round(1000 / stepsPerSecond);
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = setInterval(stepForward, stepDelay);
+      }
+    }
+
+    // Event Listeners
+    document.getElementById("startButton").addEventListener("click", startSimulation);
+    document.getElementById("stopButton").addEventListener("click", stopSimulation);
+    document.getElementById("stepForwardButton").addEventListener("click", stepForward);
+    document.getElementById("stepBackButton").addEventListener("click", stepBack);
+    document.getElementById("randomButton").addEventListener("click", randomBoard);
+    
+    speedInput.addEventListener("input", (e) => {
+      const value = parseFloat(e.target.value);
+      if (value > 0) {
+        updateSpeed(value);
+      }
+    });
+
+    // Load the grid state for the first time
+    loadInitialState();
+  </script>
+</body>
+</html>
