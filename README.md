@@ -2,7 +2,10 @@
 
 ![Demo](sample.png)
 
-An interactive implementation of Conway's Game of Life with a modern, responsive interface. Built with Flask and vanilla JavaScript. Click [here](https://flask-game-of-life.onrender.com/) for a live implementation.
+An interactive implementation of Conway's Game of Life with a modern, responsive interface. Built with Flask and vanilla JavaScript. 
+
+## Live Version
+Click [here](https://flask-game-of-life.onrender.com/) for a live implementation.
 
 ## Features
 
